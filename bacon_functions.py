@@ -94,7 +94,6 @@ def parse_actor_data(actor_data):
     lists of movies (string) the actor has been in as values.
     '''
 
-    actor_dict = {}
     count = 0
     header_skipped = False
     passed_heading = False
@@ -102,7 +101,7 @@ def parse_actor_data(actor_data):
     line = actor_data.readline()
     # Iterate till the footer of the file.
     while not header_skipped or not (line_break and line.startswith("-------")):
-
+        actor_dict = {}
         if not header_skipped:
             if line.startswith('THE ACTORS LIST') or line.startswith('THE ACTRESSES LIST'):
                 passed_heading = True
@@ -145,7 +144,7 @@ def parse_actor_data(actor_data):
             line_break = True
         line = actor_data.readline()
         count += 1
-    return actor_dict
+        yield actor_dict
 
 
 def invert_actor_dict(actor_dict):
