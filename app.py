@@ -13,6 +13,12 @@ actor_movie = db.Table(
     db.Column('movie_id', db.Integer, db.ForeignKey('movie.id')),
 )
 
+movie_director = db.Table(
+    'movie_director', 
+    db.Column('director_id', db.Integer, db.ForeignKey('director.id')),
+    db.Column('movie_id', db.Integer, db.ForeignKey('movie.id')),
+)
+
 class Actor(db.Model):
     __tablename__ = 'actor'
     id = db.Column(db.Integer, primary_key=True)
@@ -30,6 +36,19 @@ class Movie(db.Model):
     __tablename__ = 'movie'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String, index=True)
+    director = db.Column(db.Integer, db.ForeignKey('director.id'))
+
+    def __unicode__(self):
+        return self.name
+    
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+class Director(db.Model):
+    __tablename__ = 'director'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, index=True)
+    movies = db.relationship('Movie', backref=db.backref('director', lazy='dynamic'))
 
     def __unicode__(self):
         return self.name
@@ -50,6 +69,11 @@ def actor(name):
     resp = make_response(json.dumps(data))
     resp.headers['Content-Type'] = 'application/json'
     return resp
+
+# db.session.query(Movie)\
+#     .filter(Movie.actors.any(Actor.name.like('%Freeman')))\
+#     .filter(Movie.actors.any(Actor.name.like('%Cumberbatch')))\
+#     .filter(Movie.name.like("%Sherlock%")).all()
 
 if __name__ == '__main__':
     app.run(debug=True)
